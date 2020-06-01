@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_LaMetric/templates *
+recursive-include octoprint_LaMetric/translations *
+recursive-include octoprint_LaMetric/static *

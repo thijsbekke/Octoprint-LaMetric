@@ -1,0 +1,39 @@
+<h3>{{ _('LaMetric Configuration') }}</h3>
+
+<form class="form-horizontal">
+    <h4>{{ _('General') }}</h4>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('API Key') }}</label>
+
+        <div class="controls">
+            <div class="row-fluid" style="margin-bottom: 5px">
+                <div class="span8">
+                    <input type="text" class="input-block-level" id="key" data-bind="value: settings.plugins.lametric.key">
+                </div>
+
+                <div class="span4">
+                    <a href="https://developer.lametric.com/api/v2/oauth2/authorize/?client_id=969bbe24-ab8e-890f-86d1-ec5fc6fd6d1a&response_type=code&scope=basic+devices_read&state=STATE" target="_blank"  class="btn">
+                    <svg width="15px" height="15px" viewBox="0 0 15 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2; float: left; margin-top: 3px;">
+                        <g transform="matrix(0.0628141,0,0,0.0628141,0,0)">
+                            <path d="M171.027,208.814L171.027,66.026L152.456,66.026L152.456,217.45C145.312,219.824 136.741,221.462 129.598,222.226L129.598,138.882L111.027,138.882L111.027,222.332C101.027,221.574 92.455,219.701 85.312,216.838L85.312,66.026L65.312,66.026L65.312,207.759C36.741,189.729 16.406,157.202 16.406,120.063C16.406,63.355 62.555,17.385 119.262,17.385C175.97,17.385 222.018,63.355 222.018,120.063C222.018,157.951 201.027,191.021 171.027,208.814ZM119.44,0.622C53.474,0.622 0,54.096 0,120.063C0,186.027 53.474,239.5 119.44,239.5C185.406,239.5 238.88,186.027 238.88,120.063C238.88,54.096 185.406,0.622 119.44,0.622Z"/>
+                        </g>
+                    </svg>
+                    <span style="margin-left: 5px">{{ _('Obtain API key') }}</span></a>
+                </div>
+            </div>
+            <span class="help-inline">{{ _('If you already have an API key for your LaMetric put it here. Otherwise press the button "Obtain API key" too easily obtain one.') }}</span>
+        </div>
+    </div>
+     <div class="control-group">
+        <label class="control-label">{{ _('Host') }}</label>
+        <div class="controls">
+            <div class="row-fluid" style="margin-bottom: 5px">
+                <div class="span8">
+                    <input type="text" class="input-block-level" id="host" data-bind="value: settings.plugins.lametric.host">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
