@@ -19,7 +19,7 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 	timer = None
 	printing = False
 	remote_queue = []
-	interval = 3
+	interval = 10
 
 	def on_after_startup(self):
 		"""
@@ -229,19 +229,26 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 		# https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-discovery.html
 		result = json.loads(r.content)
 
-
-
 		# Then delete every other notifications
 		while self.remote_queue:
 			requests.delete(url + "/" + self.remote_queue.pop(0), verify=False, headers=headers)
 			# Verify has too be False according too the Lametric documentation :/
 			# https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-discovery.html
 
-		# Add the newly created notification too the queue
-		if(result["success"]["id"] is not None):
-			self.remote_queue.append(result["success"]["id"])
+		try:
+			if(result["success"]["id"] is not None):
+				# Add the newly created notification too the queue
+				self.remote_queue.append(result["success"]["id"])
 
+		except KeyError:
+			pass
 
+		# Or do we get an error
+		try:
+			if (result["errors"]["message"] is not None):
+				self._logger.info(result["errors"]["message"])
+		except KeyError:
+			pass
 
 	def on_settings_save(self, data):
 		"""
