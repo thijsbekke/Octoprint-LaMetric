@@ -245,8 +245,7 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 
 		# Or do we get an error
 		try:
-			if (result["errors"]["message"] is not None):
-				self._logger.info(result["errors"]["message"])
+			self._logger.info(result["errors"][0]["message"])
 		except KeyError:
 			pass
 
