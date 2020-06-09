@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 import requests,base64
 import json
+import urllib3
 from octoprint.util import RepeatedTimer
 from time import sleep
 
@@ -222,6 +223,9 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 			"model": frames
 		}
 
+		# Otherwise every INTERVAL second a warning is written to the log file
+		urllib3.disable_warnings()
+
 		# Post, delete, add to the queue. Otherwise the Lametric displays flickers
 		# First post the message
 		r = requests.post(url, verify=False, data=json.dumps(model), headers=headers)
@@ -245,7 +249,11 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 
 		# Or do we get an error
 		try:
-			self._logger.info(result["errors"][0]["message"])
+			message = result["errors"][0]["message"]
+			# Filter the "Only notifications with priority 'critical' are allowed in current mode" messages
+			if("critical" not in message):
+				self._logger.info(message)
+
 		except KeyError:
 			pass
 
