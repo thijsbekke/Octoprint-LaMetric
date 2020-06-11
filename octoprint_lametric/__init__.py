@@ -1,7 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
 
-
+import random
+import flask
 import octoprint.plugin
 import requests,base64
 import json
@@ -16,6 +17,7 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 					octoprint.plugin.EventHandlerPlugin,
 					octoprint.plugin.StartupPlugin,
 					octoprint.plugin.ProgressPlugin,
+					octoprint.plugin.SimpleApiPlugin,
 					octoprint.plugin.TemplatePlugin):
 	timer = None
 	printing = False
@@ -195,7 +197,49 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 			]
 		})
 
-	def event_message(self, frames):
+	def get_api_commands(self):
+		"""
+		return available api command
+		:return: 
+		"""
+		return dict(
+			test=["key", "host"]
+		)
+
+
+	def on_api_command(self, command, data):
+		"""
+		API command
+		:param command: 
+		:param data: 
+		:return: 
+		"""
+		if command == "test":
+			result =self.event_message({
+				"frames": [
+					{
+						"icon": "1169",
+						"text": random.choice(["it works!", "woohoo", "let's print", "Yee-haw"])
+					}
+				]
+			}, data["key"], data["host"])
+
+			try:
+				if (result["success"]["id"] is not None):
+					# Add the newly created notification too the queue
+					return flask.jsonify(dict(success=True))
+			except KeyError:
+				pass
+
+			# Or do we get an error
+			try:
+				return flask.jsonify(dict(success=False, msg=str(result["errors"][0]["message"])))
+			except KeyError:
+				pass
+
+		return flask.make_response("Unknown command", 400)
+
+	def event_message(self, frames, key = None, host = None):
 		"""
 		Send the message to the device
 		:param frames: 
@@ -208,12 +252,18 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 		if self._settings.get(["key"]) is None:
 			return
 
-		url = "https://" + self._settings.get(["host"]) + ":4343/api/v2/device/notifications"
+		if key is None:
+			key = self._settings.get(["key"])
+
+		if host is None:
+			host = self._settings.get(["host"])
+
+		url = "https://" + host + ":4343/api/v2/device/notifications"
 
 		headers = {
 			"Content-Type": "application/json",
 			"Cache-Control": "no-cache",
-			"Authorization": "Basic %s" % base64.b64encode(b'dev:' + self._settings.get(["key"]).encode()).decode('utf-8')
+			"Authorization": "Basic %s" % base64.b64encode(b'dev:' + key.encode()).decode('utf-8')
 		}
 
 		model = {
@@ -257,6 +307,8 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 		except KeyError:
 			pass
 
+		return result
+
 	def on_settings_save(self, data):
 		"""
 		Valide settings onm save
@@ -269,7 +321,7 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 			"frames": [
 				{
 					"icon": "5400",
-					"text": "Connected"
+					"text": "Settings saved"
 				}
 			]
 		})
@@ -281,13 +333,18 @@ class LaMetricPlugin(octoprint.plugin.SettingsPlugin,
 		:return: 
 		"""
 		return dict(
-			host =None,
+			host=None,
 			key=None
 		)
 
+	def get_assets(self):
+		return {
+			"js": ["js/lametric.js"]
+		}
+
 	def get_template_configs(self):
 		return [
-			dict(type="settings", custom_bindings=False),
+			dict(type="settings"),
 		]
 
 	def get_update_information(self):
